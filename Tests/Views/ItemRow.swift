@@ -45,6 +45,8 @@ struct ItemRow: View {
         }
     }
     func updateTextFieldsValues() {
+        guard index < vm.itemsList.count else { return }
+        
         if price != vm.itemsList[index].price ||
             aisle != vm.itemsList[index].aisle {
             
