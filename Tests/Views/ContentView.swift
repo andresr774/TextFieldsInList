@@ -13,7 +13,6 @@ enum InputField: Hashable {
 
 struct ContentView: View {
     @StateObject private var vm = ItemListViewModel()
-    @State private var text = ""
     @FocusState var fieldInFocus: InputField?
     
     var body: some View {
@@ -32,8 +31,7 @@ struct ContentView: View {
                     Spacer()
                     Button("Done") {
                         if fieldInFocus == .text {
-                            vm.addItem(name: text)
-                            text = ""
+                            vm.addItem()
                         }
                         fieldInFocus = nil
                     }
@@ -52,7 +50,7 @@ struct ContentView_Previews: PreviewProvider {
 extension ContentView {
     private var addItemView: some View {
         HStack(spacing: 20) {
-            TextField("Item...", text: $text)
+            TextField("Item...", text: $vm.name)
                 .focused($fieldInFocus, equals: .text)
                 .font(.headline)
                 .frame(maxWidth: .infinity)
@@ -61,8 +59,7 @@ extension ContentView {
                 .background(Color(uiColor: .secondarySystemBackground))
                 .cornerRadius(15)
                 .onSubmit {
-                    vm.addItem(name: text)
-                    text = ""
+                    vm.addItem()
                 }
         }
         .padding()

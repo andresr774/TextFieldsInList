@@ -10,14 +10,16 @@ import SwiftUI
 
 class ItemListViewModel: ObservableObject {
     @Published var itemsList = [Item]()
+    @Published var name = ""
     
-    func addItem(name: String) {
+    func addItem() {
         guard name != "" else { return }
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let newItem = Item(name: trimmedName, price: nil, aisle: nil)
         withAnimation {
             itemsList.append(newItem)
         }
+        name = ""
     }
     
     func updatePrice(index: Int, price: Double?) {
