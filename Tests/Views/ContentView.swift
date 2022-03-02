@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum InputField: Hashable {
-    case text, price, aisle
+    case name, price, aisle
 }
 
 struct ContentView: View {
@@ -29,12 +29,7 @@ struct ContentView: View {
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
-                        if fieldInFocus == .text {
-                            vm.addItem()
-                        }
-                        fieldInFocus = nil
-                    }
+                    doneButton
                 }
             }
         }
@@ -51,7 +46,7 @@ extension ContentView {
     private var addItemView: some View {
         HStack(spacing: 20) {
             TextField("Item...", text: $vm.name)
-                .focused($fieldInFocus, equals: .text)
+                .focused($fieldInFocus, equals: .name)
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .frame(height: 55)
@@ -88,6 +83,14 @@ extension ContentView {
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
+    }
+    private var doneButton: some View {
+        Button("Done") {
+            if fieldInFocus == .name {
+                vm.addItem()
+            }
+            fieldInFocus = nil
+        }
     }
 }
 
