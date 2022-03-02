@@ -34,8 +34,8 @@ class ItemListViewModel: ObservableObject {
         print("Updated aisle: \(updatedItem)")
     }
     
-    func delete(offset: IndexSet) {
-        itemsList.remove(atOffsets: offset)
+    func delete(at offsets: IndexSet) {
+        itemsList.remove(atOffsets: offsets)
     }
     
     func move(fromOffset: IndexSet, toOffset: Int) {

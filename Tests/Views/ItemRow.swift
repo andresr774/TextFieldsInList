@@ -18,7 +18,7 @@ struct ItemRow: View {
     var body: some View {
         HStack(spacing: 20) {
             Text(item.name)
-            TextField("Price...", value: $price, format: .number)
+            TextField("Price...", value: $price, format: .currency(code: Locale.current.currencyCode ?? "USD"))
                 .focused($fieldInFocus, equals: .price)
                 .padding(10)
                 .background(Color(uiColor: .secondarySystemBackground))
