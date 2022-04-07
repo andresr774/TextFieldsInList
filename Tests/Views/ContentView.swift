@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-enum InputField: Hashable {
-    case name, price, aisle
-}
-
 struct ContentView: View {
     @StateObject private var vm = ItemListViewModel()
     @FocusState var fieldInFocus: InputField?
@@ -20,7 +16,6 @@ struct ContentView: View {
             VStack {
                 addItemView
                 listOfItems
-                saveButton
             }
             .navigationTitle("Items")
             .toolbar {
@@ -32,6 +27,9 @@ struct ContentView: View {
                     doneButton
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            vm.saveItemsToDatabase()
         }
     }
 }
@@ -76,7 +74,7 @@ extension ContentView {
     }
     private var saveButton: some View {
         Button {
-            vm.saveToDatabase()
+            vm.saveItemsToDatabase()
         } label: {
             Text("Save to database")
                 .font(.headline)
