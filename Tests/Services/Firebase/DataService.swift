@@ -18,7 +18,6 @@ class DataService {
     private let REF_ITEMS = DB_BASE.collection("items")
     
     func uploadItems(items: [Item]) async {
-        
         for item in items {
             let document = REF_ITEMS.document(item.id)
             
@@ -30,9 +29,9 @@ class DataService {
             
             do {
                 try await document.setData(itemData)
-                print("[😀] Item uploaded successfully: \(item) ")
+                print("[😀] Item uploaded successfully: \(item.name) ")
             } catch {
-                print("[😀] Error uploading item: \(item) to database, error: \(error.localizedDescription)")
+                print("[😀] Error uploading item: \(item.name) to database, error: \(error.localizedDescription)")
             }
         }
     }
@@ -46,30 +45,30 @@ class DataService {
             if !documents.isEmpty {
                 documents.forEach { document in
                     if let name = document.get("name") as? String {
+                        let newItem = Item()
                         
-                        let id = document.documentID
-                        let price = document.get("price") as? Double
-                        let aisle = document.get("aisle") as? Int
+                        newItem.id = document.documentID
+                        newItem.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+                        newItem.price = document.get("price") as? Double
+                        newItem.aisle = document.get("aisle") as? Int
                         
-                        let newItem = Item(id: id, name: name, price: price, aisle: aisle)
                         items.append(newItem)
                     }
                 }
             }
         } catch {
-            print("[😀] Error downloading items: \(error)")
+            print("[😀] Error downloading items: \(error.localizedDescription)")
         }
         return items
     }
     
     func deleteItem(item: Item) async {
         let document = REF_ITEMS.document(item.id)
-        
         do {
             try await document.delete()
-            print("[😀] Item deleted from database: \(item)")
+            print("[😀] Item deleted from database: \(item.name)")
         } catch {
-            print("[😀] Error deleting document: \(error)")
+            print("[😀] Error deleting document: \(error.localizedDescription)")
         }
     }
 }

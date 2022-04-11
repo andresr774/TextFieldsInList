@@ -13,10 +13,17 @@ struct TestsApp: App {
     
     // Conect App delegate
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var vm = ItemListViewModel()
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(vm: vm)
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .inactive {
+                vm.saveItemsToDatabase()
+            }
         }
     }
 }

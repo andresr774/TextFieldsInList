@@ -8,19 +8,34 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var vm = ItemListViewModel()
-    @FocusState var fieldInFocus: InputField?
+    @ObservedObject var vm: ItemListViewModel
+    @FocusState private var fieldInFocus: InputField?
     
     var body: some View {
         NavigationView {
             VStack {
-                addItemView
-                listOfItems
+                if vm.loading {
+                    downloading
+                } else {
+                    if vm.itemsList.isEmpty {
+                        emptyList
+                    } else {
+                        listOfItems
+                    }
+                }
             }
             .navigationTitle("Items")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     EditButton()
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        vm.addItem()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.headline)
+                    }
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -28,65 +43,51 @@ struct ContentView: View {
                 }
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-            vm.saveItemsToDatabase()
-        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(vm: ItemListViewModel())
     }
 }
 
 extension ContentView {
-    private var addItemView: some View {
-        HStack(spacing: 20) {
-            TextField("Item...", text: $vm.name)
-                .focused($fieldInFocus, equals: .name)
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .frame(height: 55)
-                .padding(.horizontal)
-                .background(Color(uiColor: .secondarySystemBackground))
-                .cornerRadius(15)
-                .onSubmit {
-                    vm.addItem()
-                }
-        }
-        .padding()
-    }
     private var listOfItems: some View {
         List {
-            ForEach(vm.itemsList.indices, id: \.self) { index in
-                ItemRow(
-                    vm: vm,
-                    item: vm.itemsList[index],
-                    index: index,
-                    fieldInFocus: _fieldInFocus
-                )
+            ForEach(vm.itemsList) {
+                ItemRow(item: $0, fieldInFocus: $fieldInFocus)
+                    .listRowInsets(.init(top: 15, leading: 15, bottom: 15, trailing: 15))
             }
             .onDelete(perform: vm.delete)
             .onMove(perform: vm.move)
         }
         .listStyle(.plain)
     }
-    private var saveButton: some View {
-        Button {
-            vm.saveItemsToDatabase()
-        } label: {
-            Text("Save to database")
-                .font(.headline)
+    
+    private var emptyList: some View {
+        VStack(spacing: 10) {
+            Text("🙁")
+                .font(.system(size: 50))
+            
+            Text("You have not created any Item yet. Please tap \"")
+            + Text("+")
+                .font(.title2.weight(.semibold))
+            + Text("\" to add one.")
+            
+            Spacer()
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
+        .padding()
     }
+    
+    private var downloading: some View {
+        Text("Downloading Items...")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .padding()
+    }
+    
     private var doneButton: some View {
         Button("Done") {
-            if fieldInFocus == .name {
-                vm.addItem()
-            }
             fieldInFocus = nil
         }
     }
